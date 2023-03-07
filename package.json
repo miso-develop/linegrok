@@ -1,0 +1,49 @@
+{
+	"name": "linegrok",
+	"version": "1.0.0",
+	"description": "When the process is executed, ngrok is started, the URL is acquired, and the Webhook URL to the LINE Developer Console is updated at the same time.",
+	"main": "dist/index.js",
+	"types": "dist/index.d.ts",
+	"files": [
+		"dist"
+	],
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/miso-develop/linegrok"
+	},
+	"author": "Miso Tanaka <miso.develop@gmail.com>",
+	"license": "MIT",
+	"keywords": [
+		"line",
+		"bot",
+		"ngrok",
+		"webhook"
+	],
+	"private": false,
+	"scripts": {
+		"start": "node ./dist/index.js",
+		"s": "npm run start",
+		"nodemon": "nodemon ./dist/index.js",
+		"nm": "npm run nodemon",
+		"clean": "npx rimraf dist",
+		"c": "npm run clean",
+		"prebuild": "npm run clean",
+		"build": "npx tsc --sourceMap false --declarationMap false",
+		"b": "npm run build",
+		"prewatch": "npm run clean",
+		"watch": "npx tsc -w",
+		"w": "npm run watch",
+		"update": "npm ci && npm run build",
+		"u": "npm run update",
+		"": ""
+	},
+	"dependencies": {
+		"@line/bot-sdk": "^7.5.2",
+		"ngrok": "^4.3.3"
+	},
+	"devDependencies": {
+		"@types/node": "^18.14.6",
+		"rimraf": "^4.3.1",
+		"typescript": "^4.9.5"
+	}
+}
