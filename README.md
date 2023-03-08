@@ -25,8 +25,8 @@ const { Client, middleware } = require("@line/bot-sdk")
 const port = process.env.PORT || 3000
 
 const config = {
-	channelAccessToken: process.env.CHANNEL_ACCESS_TOKEN,
-	channelSecret: process.env.CHANNEL_SECRET,
+    channelAccessToken: process.env.CHANNEL_ACCESS_TOKEN,
+    channelSecret: process.env.CHANNEL_SECRET,
 }
 
 const client = new Client(config)
@@ -35,6 +35,46 @@ linegrok({ client, port })
 
 ...
 
+```
+
+As an example, the code for a parrot bot would be as follows.  
+(Please set the CHANNEL_ACCESS_TOKEN and CHANNEL_SECRET as environment variables and try running it)  
+
+```js
+const express = require("express")
+const { Client, middleware } = require("@line/bot-sdk")
+const { linegrok } = require("linegrok")
+
+const port = process.env.PORT || 3000
+const config = {
+    channelAccessToken: process.env.CHANNEL_ACCESS_TOKEN,
+    channelSecret: process.env.CHANNEL_SECRET,
+}
+const client = new Client(config)
+
+linegrok({ client, port })
+
+
+
+const app = express()
+app.post("/", middleware(config), (req, res) => {
+    handleEvents(req.body.events)
+    res.send({ status: 200 })
+})
+app.listen(port, () => console.log(`Start server!`))
+
+
+
+const handleEvents = events => {
+    events.forEach(event => {
+        switch (event.type) {
+            case "message": client.replyMessage(event.replyToken, {
+                type: "text",
+                text: event.message.text,
+            }); break
+        }
+    })
+}
 ```
 
 
