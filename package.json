@@ -21,6 +21,7 @@
 	],
 	"private": false,
 	"scripts": {
+		"postinstall": "npx ngrok update",
 		"start": "node ./dist/index.js",
 		"s": "npm run start",
 		"nodemon": "nodemon ./dist/index.js",
@@ -39,7 +40,8 @@
 	},
 	"dependencies": {
 		"@line/bot-sdk": "^7.5.2",
-		"ngrok": "^4.3.3"
+		"ngrok": "^4.3.3",
+		"semver": "^7.3.8"
 	},
 	"devDependencies": {
 		"@types/node": "^18.14.6",

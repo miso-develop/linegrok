@@ -1,5 +1,6 @@
 import ngrok, { Ngrok } from "ngrok"
 import { Client } from "@line/bot-sdk"
+import semver from "semver"
 
 export namespace Linegrok {
 	export type Options = {
@@ -44,9 +45,12 @@ const keepAlive = (options: Linegrok.Options): void => {
 }
 
 const setWebhookUrl = async (options: Linegrok.Options): Promise<Linegrok.EndpointUrl> => {
+	// MEMO: ngrok実行ファイルが古いバージョンだと"jp"リージョンに対応しているか不明なため、v2.3.40未満は一律"us"リージョンにする
+	const region = semver.gte(await ngrok.getVersion(), "2.3.40") ? options.region : "us"
+	
 	const ngrokOptions: Ngrok.Options = {
 		addr: options.port,
-		region: options.region,
+		region,
 		authtoken: options.authtoken,
 	}
 	
