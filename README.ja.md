@@ -2,7 +2,7 @@
 
 ### [**English**](README.md) | **日本語**
 
-linegrokはngrokの起動およびURL取得と、LINE Developer ConsoleへのWebhook URL更新を同時に行います。  
+linegrokはngrokの起動およびURL取得と、LINE DevelopersコンソールへのWebhook URL更新を同時に行います。  
 ngrokを認証していない場合は2時間でURLが無効となりますが（2023/3/8現在）、1時間半おきにngrok URLの再発行とWebhook URLの更新を自動で行います。  
 
 

@@ -2,7 +2,7 @@
 
 ### **English** | [**日本語**](README.ja.md)
 
-linegrok performs both starting ngrok and acquiring URL, and updating the Webhook URL in LINE Developer Console at the same time.  
+linegrok performs both starting ngrok and acquiring URL, and updating the Webhook URL in LINE Developers console at the same time.  
 If you have not authenticated ngrok, the URL will become invalid after two hours (as of 2023/3/8), but linegrok will automatically regenerate the ngrok URL and update the Webhook URL every 1.5 hours.  
 
 ## Installation
