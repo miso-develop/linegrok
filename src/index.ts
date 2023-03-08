@@ -1,20 +1,24 @@
 import ngrok, { Ngrok } from "ngrok"
 import { Client } from "@line/bot-sdk"
 
-const Default: Omit<LinegrokOptions, "client" | "port"> = {
+export namespace Linegrok {
+	export type Options = {
+		client: Client,
+		port: string | number,
+		path?: string,
+		authtoken?: string,
+		region?: Ngrok.Region,
+		interval?: number,
+	}
+	
+	export type EndpointUrl = string
+}
+
+const Default: Omit<Linegrok.Options, "client" | "port"> = {
 	path: "/",
 	region: "jp",
 	authtoken: undefined,
 	interval: 90 * 60 * 1000,
-}
-
-export type LinegrokOptions = {
-	client: Client,
-	port: string | number,
-	path?: string,
-	authtoken?: string,
-	region?: Ngrok.Region,
-	interval?: number,
 }
 
 export const linegrok = async ({
@@ -24,22 +28,22 @@ export const linegrok = async ({
 	region = Default.region,
 	authtoken = Default.authtoken,
 	interval = Default.interval,
-}: LinegrokOptions): Promise<string> => {
-	const options: LinegrokOptions = { client, port, path, region, authtoken, interval }
+}): Promise<Linegrok.EndpointUrl> => {
+	const options: Linegrok.Options = { client, port, path, region, authtoken, interval }
 	keepAlive(options)
 	return await setWebhookUrl(options)
 }
 
-const keepAlive = (options: LinegrokOptions): void => {
+const keepAlive = (options: Linegrok.Options): void => {
 	if (!!options.authtoken) return
 	
 	setInterval(async () => {
-		await ngrok.disconnect()
+		await ngrok.kill()
 		await setWebhookUrl(options)
 	}, options.interval)
 }
 
-const setWebhookUrl = async (options: LinegrokOptions): Promise<string> => {
+const setWebhookUrl = async (options: Linegrok.Options): Promise<Linegrok.EndpointUrl> => {
 	const ngrokOptions: Ngrok.Options = {
 		addr: options.port,
 		region: options.region,
@@ -53,12 +57,12 @@ const setWebhookUrl = async (options: LinegrokOptions): Promise<string> => {
 		return endpointUrl
 		
 	} catch (e) {
-		handleError(e)
+		await handleError(e)
 		throw e
 	}
 }
 
-const handleError = async (error) => {
+const handleError = async (error: Error): Promise<void> => {
 	if (error.toString().includes("TypeError: Cannot read properties of undefined (reading 'body')")) {
 		// MEMO: 不正なauthtokenが登録されたままだとngrokの実行が正常に行えないため、authtokenをクリアする
 		await ngrok.authtoken("")
