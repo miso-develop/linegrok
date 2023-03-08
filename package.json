@@ -1,6 +1,6 @@
 {
 	"name": "linegrok",
-	"version": "1.0.0",
+	"version": "1.0.1",
 	"description": "When the process is executed, ngrok is started, the URL is acquired, and the Webhook URL to the LINE Developer Console is updated at the same time.",
 	"main": "dist/index.js",
 	"types": "dist/index.d.ts",
@@ -33,7 +33,7 @@
 		"prewatch": "npm run clean",
 		"watch": "npx tsc -w",
 		"w": "npm run watch",
-		"update": "npm ci && npm run build",
+		"update": "npm i && npm run build",
 		"u": "npm run update",
 		"": ""
 	},
