@@ -1,64 +1,45 @@
 import ngrok, { Ngrok } from "ngrok"
-import { Client } from "@line/bot-sdk"
-import semver from "semver"
+import { messagingApi } from "@line/bot-sdk"
 
 export namespace Linegrok {
 	export type Options = {
-		client: Client,
-		port: string | number,
-		path?: string,
-		authtoken?: string,
-		region?: Ngrok.Region,
-		interval?: number,
+		channelAccessToken: string
+		port: string | number
+		path?: string
+		authtoken?: string
+		region?: Ngrok.Region
 	}
 	
 	export type EndpointUrl = string
 }
 
-const Default: Omit<Linegrok.Options, "client" | "port"> = {
+const OptionDefault: Omit<Linegrok.Options, "channelAccessToken" | "port"> = {
 	path: "/",
 	region: "jp",
 	authtoken: undefined,
-	interval: 90 * 60 * 1000,
 }
 
 export const linegrok = async ({
-	client,
+	channelAccessToken,
 	port,
-	path = Default.path,
-	region = Default.region,
-	authtoken = Default.authtoken,
-	interval = Default.interval,
-}): Promise<Linegrok.EndpointUrl> => {
-	const options: Linegrok.Options = { client, port, path, region, authtoken, interval }
-	keepAlive(options)
-	return await setWebhookUrl(options)
-}
-
-const keepAlive = (options: Linegrok.Options): void => {
-	if (!!options.authtoken) return
-	
-	setInterval(async () => {
-		await ngrok.kill()
-		await setWebhookUrl(options)
-	}, options.interval)
-}
-
-const setWebhookUrl = async (options: Linegrok.Options): Promise<Linegrok.EndpointUrl> => {
-	// MEMO: ngrok実行ファイルが古いバージョンだと"jp"リージョンに対応しているか不明なため、v2.3.40未満は一律"us"リージョンにする
-	const region = semver.gte(await ngrok.getVersion(), "2.3.40") ? options.region : "us"
-	
+	path = OptionDefault.path,
+	region = OptionDefault.region,
+	authtoken = OptionDefault.authtoken,
+}: Linegrok.Options): Promise<Linegrok.EndpointUrl> => {
 	const ngrokOptions: Ngrok.Options = {
-		addr: options.port,
+		addr: port,
 		region,
-		authtoken: options.authtoken,
+		authtoken,
 	}
 	
 	try {
 		const ngrokUrl = await ngrok.connect(ngrokOptions)
-		const endpointUrl = `${ngrokUrl}${options.path}`
-		await options.client.setWebhookEndpointUrl(endpointUrl)
-		return endpointUrl
+		const endpoint = `${ngrokUrl}${path}`
+		
+		const client = new messagingApi.MessagingApiClient({ channelAccessToken })
+		client.setWebhookEndpoint({ endpoint })
+		
+		return endpoint
 		
 	} catch (e) {
 		await handleError(e)
